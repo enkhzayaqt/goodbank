@@ -20,12 +20,16 @@ export default function CreateAccount() {
   }
 
   function handleCreate() {
-    console.log(name, email, password);
     if (!validate(name, "name")) return;
     if (!validate(email, "email")) return;
     if (!validate(password, "password")) return;
     ctx.users.push({ name, email, password, balance: 100 });
-    console.log("createAccount", ctx);
+    ctx.activities.push({
+      name,
+      email,
+      action: "Create Account",
+      stamp: new Date().toString(),
+    });
     setShow(false);
   }
 

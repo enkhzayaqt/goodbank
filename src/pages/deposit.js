@@ -20,7 +20,7 @@ export default function Deposit() {
       let name = ctx.session.name;
       let email = ctx.session.email;
       updateUser(email);
-      ctx.actions.push({
+      ctx.activities.push({
         name,
         email,
         action: "Deposit",

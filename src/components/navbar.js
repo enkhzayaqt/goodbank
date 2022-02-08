@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 export default function NavBar() {
   return (
     <>
@@ -19,30 +21,29 @@ export default function NavBar() {
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav">
             <li className="nav-item">
-              <a className="nav-link" href="/register">
+              <Link className="nav-link" to="register">
                 Create Account
-              </a>
+              </Link>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="/login">
+              <Link className="nav-link" to="login">
                 Login
-              </a>
+              </Link>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="/deposit">
+              <Link className="nav-link" to="deposit">
                 Deposit
-              </a>
+              </Link>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="/withdraw">
+              <Link className="nav-link" to="withdraw">
                 Withdraw
-              </a>
+              </Link>
             </li>
-
             <li className="nav-item">
-              <a className="nav-link" href="/alldata">
+              <Link className="nav-link" to="alldata">
                 AllData
-              </a>
+              </Link>
             </li>
           </ul>
         </div>

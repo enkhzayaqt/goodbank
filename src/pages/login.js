@@ -1,4 +1,5 @@
 import React, { useState, useContext } from "react";
+import { Link } from "react-router-dom";
 import Card from "../components/card";
 import { UserContext } from "../context";
 
@@ -8,8 +9,6 @@ export default function Login() {
   const [warn, setWarn] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
-  console.log("login", ctx);
 
   function validate(field, label) {
     if (!field) {
@@ -23,24 +22,23 @@ export default function Login() {
   function handleSubmit() {
     if (!validate(email, "email")) return;
     if (!validate(password, "password")) return;
-    console.log(ctx.users);
-    let act = ctx.users.filter(
+    let account = ctx.users.find(
       (item) => item.email === email && item.password === password
     );
-    if (act.length < 1) {
-      setWarn("no matching account");
+    if (!account) {
+      setWarn("Username or password is incorrect!");
       setTimeout(() => setWarn(""), 4000);
       return;
     }
-    let name = act[0].name;
-    setEmail(act.email);
-    ctx.actions.push({
+    let name = account.name;
+    setEmail(account.email);
+    ctx.activities.push({
       name,
       email,
       action: "Login",
       stamp: new Date().toString(),
     });
-    ctx.session = { name, email, balance: act[0].balance };
+    ctx.session = { name, email, balance: account.balance };
     setShow(false);
   }
 
@@ -89,21 +87,12 @@ export default function Login() {
         ) : (
           <>
             <h5>Your Account Session has been Succesfully Started</h5>
-            <button
-              type="submit"
-              className="btn btn-dark"
-              onClick={(event) => (window.Location.href = "#/deposit/")}
-            >
+            <Link className="nav-link" className="btn btn-dark" to="deposit">
               Deposit
-            </button>
-            <button
-              type="submit"
-              className="btn btn-dark"
-              onClick={(event) => (window.Location.href = "#/withdraw/")}
-              style={{ margin: "10px" }}
-            >
+            </Link>
+            <Link className="nav-link" className="btn btn-dark" to="withdraw">
               Withdraw
-            </button>
+            </Link>
           </>
         )
       }

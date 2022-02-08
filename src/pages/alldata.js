@@ -23,7 +23,7 @@ export default function AllData() {
               </tr>
             </thead>
             <tbody>
-              {ctx.actions.map((item, index) => (
+              {ctx.activities.map((item, index) => (
                 <tr key={index}>
                   <td>{item.name}</td>
                   <td>{item.email}</td>

@@ -29,7 +29,7 @@ export default function Withdraw() {
       setTimeout(() => setStatus(""), 3000);
       setTransAmount("");
       updateUser(email);
-      ctx.actions.push({
+      ctx.activities.push({
         name,
         email,
         action: "Withdraw",
