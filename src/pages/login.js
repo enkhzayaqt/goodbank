@@ -6,93 +6,91 @@ import { UserContext } from "../context";
 export default function Login() {
   const ctx = useContext(UserContext);
   const [show, setShow] = useState(true);
-  const [warn, setWarn] = useState("");
+  const [warning, setWarning] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  function validate(field, label) {
-    if (!field) {
-      setWarn(label.toUpperCase() + "warning!");
-      setTimeout(() => setWarn(""), 3000);
-      return false;
-    }
-    return true;
-  }
-
-  function handleSubmit() {
-    if (!validate(email, "email")) return;
-    if (!validate(password, "password")) return;
+  const handleSubmit = () => {
     let account = ctx.users.find(
-      (item) => item.email === email && item.password === password
+      (user) => user.email === email && user.password === password
     );
     if (!account) {
-      setWarn("Username or password is incorrect!");
-      setTimeout(() => setWarn(""), 4000);
+      setWarning("Username or password is incorrect!");
       return;
+    } else {
+      ctx.activities.push({
+        name: account.name,
+        email: account.email,
+        action: "Login",
+        stamp: new Date().toString(),
+      });
+      ctx.session = {
+        name: account.name,
+        email: account.email,
+        balance: account.balance,
+      };
+      setShow(false);
     }
-    let name = account.name;
-    setEmail(account.email);
-    ctx.activities.push({
-      name,
-      email,
-      action: "Login",
-      stamp: new Date().toString(),
-    });
-    ctx.session = { name, email, balance: account.balance };
-    setShow(false);
-  }
+  };
 
   return (
     <Card
-      bgcolor="info"
-      txtcolor="light"
+      headerbg="info"
+      bgcolor="light"
       header="Login"
-      warn={warn}
+      warn={warning}
       body={
-        show ? (
+        Object.keys(ctx.session).length > 0 ? (
           <>
-            <div style={{ maxWidth: "30rem" }}>
-              <div>Email</div>
-              <input
-                type="input"
-                className="form-control"
-                id="email"
-                placeholder="Enter Email"
-                value={email}
-                onChange={(e) => setEmail(e.currentTarget.value)}
-                required
-              />
-              <div>Password</div>
-              <input
-                type="input"
-                minLength="8"
-                className="form-control"
-                id="password"
-                placeholder="Enter Password"
-                value={password}
-                onChange={(e) => setPassword(e.currentTarget.value)}
-                required
-              />
+            <h4>Welcome to Bad Bank Portal!</h4>
+            <div className="mb-4">You have successfully logged in.</div>
+            <Link className="btn btn-success" to="deposit">
+              Deposit
+            </Link>
+            <Link className="btn btn-warning ml-3" to="withdraw">
+              Withdraw
+            </Link>
+          </>
+        ) : (
+          <>
+            <div>
+              <div className="mb-3">
+                <label htmlFor="email">Email</label>
+                <input
+                  type="input"
+                  className="form-control"
+                  id="email"
+                  placeholder="Enter Email"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.currentTarget.value);
+                    setWarning("");
+                  }}
+                />
+              </div>
+              <div className="mb-4">
+                <div>Password</div>
+                <input
+                  type="password"
+                  className="form-control"
+                  id="password"
+                  placeholder="Enter Password"
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.currentTarget.value);
+                    setWarning("");
+                  }}
+                />
+              </div>
               <button
-                disabled={!email && !password}
+                disabled={!email || !password}
                 type="submit"
-                className="btn btn-dark"
+                className="btn btn-info"
                 onClick={handleSubmit}
-                style={{ margin: "10px" }}
               >
                 Login
               </button>
             </div>
-          </>
-        ) : (
-          <>
-            <h5>Your Account Session has been Succesfully Started</h5>
-            <Link className="nav-link" className="btn btn-dark" to="deposit">
-              Deposit
-            </Link>
-            <Link className="nav-link" className="btn btn-dark" to="withdraw">
-              Withdraw
-            </Link>
           </>
         )
       }

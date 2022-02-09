@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Route, Switch, HashRouter } from "react-router-dom";
+import { Route, HashRouter } from "react-router-dom";
 import NavBar from "./components/navbar";
 import Home from "./pages/home";
 import Deposit from "./pages/deposit";
@@ -7,6 +7,7 @@ import CreateAccount from "./pages/createAccount";
 import Withdraw from "./pages/withdraw";
 import AllData from "./pages/alldata";
 import Login from "./pages/login";
+import Profile from "./pages/profile";
 import { UserContext } from "./context";
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
           <Route path="/login" component={Login} />
           <Route path="/withdraw" component={Withdraw} />
           <Route path="/alldata" component={AllData} />
+          <Route path="/profile" component={Profile} />
         </UserContext.Provider>
       </div>
     </HashRouter>

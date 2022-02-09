@@ -7,32 +7,34 @@ export default function AllData() {
 
   return (
     <Card
-      style={{ width: "auto" }}
-      txtcolor="success"
+      maxWidth="none"
       bgcolor="light"
-      header="Session Log"
+      headerbg="dark"
+      header="Activity log"
       body={
-        <div className="table-responsive">
-          <table id="userTab">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Action</th>
-                <th>Date/Time</th>
-              </tr>
-            </thead>
-            <tbody>
-              {ctx.activities.map((item, index) => (
-                <tr key={index}>
-                  <td>{item.name}</td>
-                  <td>{item.email}</td>
-                  <td>{item.action}</td>
-                  <td>{item.stamp}</td>
+        <div>
+          <div className="table-responsive">
+            <table id="userTab" className="table table-striped table-bordered">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Action</th>
+                  <th>Date/Time</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {ctx.activities.map((item, index) => (
+                  <tr key={index}>
+                    <td>{item.name}</td>
+                    <td>{item.email}</td>
+                    <td>{item.action}</td>
+                    <td>{item.stamp}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       }
     />

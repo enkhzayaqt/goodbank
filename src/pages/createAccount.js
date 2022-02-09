@@ -1,100 +1,166 @@
 import React, { useState, useContext } from "react";
+import { Link } from "react-router-dom";
 import Card from "../components/card";
 import { UserContext } from "../context";
 
 export default function CreateAccount() {
   const ctx = useContext(UserContext);
-  const [show, setShow] = useState(true);
-  const [status, setStatus] = useState("");
+  const [isNewAccount, setIsNewAccount] = useState(true);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [nameIsValid, setNameIsValid] = useState(true);
+  const [emailIsValid, setEmailIsValid] = useState(true);
+  const [emailErrorMessage, setEmailErrorMessage] = useState("");
+  const [passwordIsValid, setPasswordIsValid] = useState(true);
+  const [passwordErrorMessage, setPasswordErrorMessage] = useState("");
+  const [isFormEmpty, setIsFormEmpty] = useState(true);
 
-  function validate(field, label) {
-    if (!field) {
-      setStatus("Error: " + label);
-      setTimeout(() => setStatus(""), 3000);
-      return false;
+  const validate = () => {
+    let hasError = false;
+    if (!name) setNameIsValid(false);
+    if (!email) {
+      setEmailIsValid(false);
+      setEmailErrorMessage("Email is required!");
+    } else {
+      let isEmailSyntaxCorrect = email
+        .toLowerCase()
+        .match(
+          /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+        );
+      if (!isEmailSyntaxCorrect) {
+        setEmailIsValid(false);
+        setEmailErrorMessage("Email format is invalid!");
+        hasError = true;
+      }
     }
-    return true;
-  }
+    if (!password) {
+      setPasswordIsValid(false);
+      setPasswordErrorMessage("Password is required!");
+    } else {
+      if (password.length < 8) {
+        setPasswordIsValid(false);
+        setPasswordErrorMessage("Password needs to have at least 8 letters!");
+        hasError = true;
+      }
+    }
+    if (!name || !email || !password) {
+      hasError = true;
+    }
+    return !hasError;
+  };
 
-  function handleCreate() {
-    if (!validate(name, "name")) return;
-    if (!validate(email, "email")) return;
-    if (!validate(password, "password")) return;
-    ctx.users.push({ name, email, password, balance: 100 });
-    ctx.activities.push({
-      name,
-      email,
-      action: "Create Account",
-      stamp: new Date().toString(),
-    });
-    setShow(false);
-  }
+  const handleCreate = () => {
+    if (validate()) {
+      ctx.users.push({ name, email, password, balance: 100 });
+      ctx.activities.push({
+        name,
+        email,
+        action: "Create Account",
+        stamp: new Date().toString(),
+      });
+      setIsNewAccount(false);
+    }
+  };
 
-  function clearForm() {
+  const clearForm = () => {
     setName("");
     setEmail("");
     setPassword("");
-    setShow(true);
-  }
+    setNameIsValid(true);
+    setEmailIsValid(true);
+    setEmailErrorMessage("");
+    setPasswordIsValid(true);
+    setPasswordErrorMessage("");
+    setIsNewAccount(true);
+    setIsFormEmpty(true);
+  };
 
   return (
     <Card
-      bgcolor="primary"
+      bgcolor="light"
+      headerbg="primary"
       header="Create Account"
-      status={status}
       body={
-        show ? (
+        isNewAccount ? (
           <>
-            Name
-            <br />
-            <input
-              type="input"
-              className="form-control"
-              id="name"
-              placeholder="Enter name"
-              value={name}
-              onChange={(e) => setName(e.currentTarget.value)}
-            />
-            <br />
-            Email address
-            <br />
-            <input
-              type="input"
-              className="form-control"
-              id="email"
-              placeholder="Enter email"
-              value={email}
-              onChange={(e) => setEmail(e.currentTarget.value)}
-            />
-            <br />
-            Password
-            <br />
-            <input
-              type="password"
-              className="form-control"
-              id="password"
-              placeholder="Enter password"
-              value={password}
-              onChange={(e) => setPassword(e.currentTarget.value)}
-            />
-            <br />
+            <div className="mb-3">
+              <label htmlFor="name">Name</label>
+              <input
+                type="input"
+                className="form-control"
+                id="name"
+                placeholder="Enter name"
+                value={name}
+                onChange={(e) => {
+                  setName(e.currentTarget.value);
+                  setNameIsValid(true);
+                  if (e.currentTarget.value) setIsFormEmpty(false);
+                  else setIsFormEmpty(true);
+                }}
+              />
+              {!nameIsValid && (
+                <div className="text-danger mt-1">Name is required!</div>
+              )}
+            </div>
+            <div className="mb-3">
+              <label htmlFor="email">Email address</label>
+              <input
+                type="input"
+                className="form-control"
+                id="email"
+                placeholder="Enter email"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.currentTarget.value);
+                  setEmailIsValid(true);
+                  setEmailErrorMessage("");
+                  if (e.currentTarget.value) setIsFormEmpty(false);
+                  else setIsFormEmpty(true);
+                }}
+              />
+              {!emailIsValid && (
+                <div className="text-danger mt-1">{emailErrorMessage}</div>
+              )}
+            </div>
+            <div className="mb-4">
+              <label htmlFor="password">Password</label>
+              <input
+                type="password"
+                className="form-control"
+                id="password"
+                placeholder="Enter password"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.currentTarget.value);
+                  setPasswordIsValid(true);
+                  setPasswordErrorMessage("");
+                }}
+              />
+              {!passwordIsValid && (
+                <div className="text-danger mt-1">{passwordErrorMessage}</div>
+              )}
+            </div>
             <button
+              disabled={isFormEmpty}
               type="submit"
-              className="btn btn-light"
-              onClick={handleCreate}
+              className="btn btn-primary"
+              onClick={() => handleCreate()}
             >
               Create Account
             </button>
           </>
         ) : (
           <>
-            <h5>Success</h5>
-            <button type="submit" className="btn btn-light" onClick={clearForm}>
-              Add another account
-            </button>
+            <h4>Account created successfully!</h4>
+            <div className="mt-3">
+              <button className="btn btn-secondary" onClick={() => clearForm()}>
+                Add another account
+              </button>
+              <Link className="btn btn-primary ml-2" to="login">
+                Login now
+              </Link>
+            </div>
           </>
         )
       }

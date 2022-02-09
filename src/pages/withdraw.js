@@ -1,90 +1,92 @@
-import React from "react";
+import React, { useContext, useState } from "react";
+import { Link } from "react-router-dom";
 import Card from "../components/card";
 import { UserContext } from "../context";
 
 export default function Withdraw() {
-  const ctx = React.useContext(UserContext);
-  const [status, setStatus] = React.useState("");
-  const [warn, setWarn] = React.useState("");
-  const [transAmount, setTransAmount] = React.useState("");
-  const [balance, setBalance] = React.useState(ctx.session.balance);
+  const ctx = useContext(UserContext);
+  const [warning, setWarning] = useState("");
+  const [withdrawAmount, setWithdrawAmount] = useState("");
+  const [balance, setBalance] = useState(ctx.session.balance);
 
-  function handleSubmit() {
-    if (
-      Math.sign(Number(transAmount)) === 1 ||
-      Math.sign(Number(transAmount)) === 0
-    ) {
-      if (Number(transAmount) > Number(balance)) {
-        setWarn(
-          "UNABLE TO COMPLETE TRANSACTION DUE TO WITHDRAW AMOUNT EXCEEDING AVAILABLE BALANCE"
-        );
-        setTimeout(() => setWarn(""), 3000);
-        return;
-      }
-      setBalance(Number(balance) - Number(transAmount));
-      ctx.session.balance = Number(ctx.session.balance) - Number(transAmount);
-      let name = ctx.session.name;
-      let email = ctx.session.email;
-      setStatus("Your Transaction has Succesfully Completed");
-      setTimeout(() => setStatus(""), 3000);
-      setTransAmount("");
-      updateUser(email);
+  const handleSubmit = () => {
+    if (validateWithdraw()) {
+      const newBalance = Number(balance) - Number(withdrawAmount);
+      setBalance(newBalance);
+      ctx.session.balance = newBalance;
+      ctx.users.map((user) => {
+        if (user.email === ctx.session.email) {
+          user.balance = newBalance;
+        }
+      });
       ctx.activities.push({
-        name,
-        email,
+        name: ctx.session.name,
+        email: ctx.session.email,
         action: "Withdraw",
         stamp: new Date().toString(),
       });
-    } else {
-      setWarn(
-        "You have entered in invalid number. Please make sure to not add -"
-      );
-      setTransAmount("");
-      setTimeout(() => setWarn(""), 3000);
+      setWithdrawAmount("");
+      alert("Withdraw process has successfully finished!");
     }
-  }
+  };
 
-  function updateUser(email) {
-    ctx.users.map((item) => {
-      if (item.email === email) {
-        item.balance = ctx.session.balance;
-      }
-    });
-  }
+  const validateWithdraw = () => {
+    let withdrawAmountNumber = Number(withdrawAmount);
+    if (isNaN(withdrawAmount)) {
+      setWarning(
+        "Deposit amount is invalid. Please make sure to enter valid numbers!"
+      );
+      setWithdrawAmount("");
+      return false;
+    } else if (withdrawAmountNumber < 0) {
+      setWarning("Withdraw amount cannot be negative!");
+      setWithdrawAmount("");
+      return false;
+    } else if (withdrawAmountNumber === 0) {
+      setWarning("Withdraw amount cannot be zero!");
+      setWithdrawAmount("");
+      return false;
+    } else if (withdrawAmountNumber > Number(balance)) {
+      setWarning("You don't have sufficient balance to withdraw !");
+      setWithdrawAmount("");
+      return false;
+    }
+    return true;
+  };
 
   return (
     <Card
-      bgcolor="secondary"
-      txtcolor="light"
+      bgcolor="light"
+      headerbg="warning"
       header="Withdraw"
-      status={status}
-      warn={warn}
+      warn={warning}
       body={
         Object.keys(ctx.session).length > 0 ? (
-          <div style={{ maxWidth: "30rem" }}>
+          <div>
             <h4>Current Balance $ {balance}</h4>
             <input
-              type="number"
               className="form-control"
-              value={transAmount}
-              onChange={(e) => setTransAmount(e.currentTarget.value)}
-              required
+              value={withdrawAmount}
+              onChange={(e) => {
+                setWithdrawAmount(e.currentTarget.value);
+                setWarning("");
+              }}
             />
             <button
-              disabled={!transAmount}
+              disabled={!withdrawAmount}
               type="submit"
-              className="btn btn-dark"
+              className="btn btn-warning mt-4"
               onClick={handleSubmit}
-              style={{ margin: "10px" }}
             >
               Process Transaction
             </button>
           </div>
         ) : (
           <>
-            <div>
-              Please Login in to View Account Balance and Process Transactions
-            </div>
+            <div>Please login to withdraw</div>
+            <Link className="btn btn-warning mt-3" to="login">
+              Login
+            </Link>
           </>
         )
       }
